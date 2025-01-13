@@ -6,7 +6,6 @@ function UserList () {
 
     const [usersList, setUsersList] = useState([]);
 
-    const { counters } = useContext(InteractionsContext);
 
     useEffect(() => {
         async function fetchPromises () {
