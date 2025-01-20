@@ -35,13 +35,13 @@ function Home () {
             <div className="flex gap-4 bg-blue-300 rounded-xl font-semibold mt-10 items-center">
                 <h3 className="ml-4">Hard Task: Implement a `InteractionsContext` to track the number of user profiles visited by the current user. On the main users list page, show the count of profiles visited.</h3>
             </div>
-            <div className="flex flex-col gap-4 bg-red-300 rounded-xl font-semibold ">
-                <h3 className="ml-4 mt-2">Not Solved:</h3>
+            <div className="flex flex-col gap-4 bg-green-300 rounded-xl font-semibold ">
+                <h3 className="ml-4 mt-2">Solved:</h3>
                 <p className="ml-4">
-                    - The Link element goes to the UserPage component, where we add user.id at the end of the url.
+                    - 
                 </p>
                 <p className="ml-4">
-                    - Inside the UserPage component we fetch the user by just adding /id at the end and then we write out all the info that we want from the api. <br/>
+                    - <br/>
                     <span className="ml-2" />
                 </p>
             </div>
