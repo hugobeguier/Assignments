@@ -13,7 +13,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
   id Int @id @default(autoincrement())
   userName String
@@ -21,4 +20,11 @@ model User {
   email String
   mobileNumber String
   country String
+}
+
+model Entry {
+  id Int @id @default(autoincrement())
+  title String
+  content String
+  createdDate String
 }
