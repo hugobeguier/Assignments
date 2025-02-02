@@ -42,7 +42,7 @@ app.post('/create-entry', async (req, res) => {
         data : {
             title: entryData.title,
             content: entryData.content,
-            createdDate: entryData.createdDate
+            createdDate: new Date(entryData.createdDate) 
         }
     });
 
