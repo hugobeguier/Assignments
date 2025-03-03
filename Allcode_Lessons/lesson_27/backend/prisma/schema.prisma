@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+model Journal {
+  id Int @id @default(autoincrement())
+  title String 
+  description String
+  posts Post[]
+  users Users[]
+  createdDate DateTime @default(now())
+}
+
+model Post {
+  id Int @id @default(autoincrement())
+  content String
+  likes Int @default(0)
+  journal Journal @relation(fields: [journalId],references: [id])
+  journalId Int
+  travelImages TravelImages[]
+  comments Comments[] 
+  createdDate DateTime @default(now())
+}
+
+model TravelImages {
+  id Int @id @default(autoincrement())
+  imageUrl String
+  post Post @relation(fields:[postId], references:[id])
+  postId Int
+}
+
+model Comments {
+  id Int @id @default(autoincrement())
+  comment String
+  post Post @relation(fields: [postId], references: [id])
+  postId Int
+  user Users @relation(fields: [userId], references: [id])
+  userId Int
+}
+
+model Users {
+  id Int @id @default(autoincrement())
+  email String
+  username String
+  password String
+  comment Comments[]
+  journal Journal @relation(fields: [journalId], references: [id])
+  journalId Int
+}
