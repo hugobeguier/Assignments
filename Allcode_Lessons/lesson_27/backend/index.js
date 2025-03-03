@@ -76,6 +76,29 @@ app.post('/create-travelImage', async (req, res) => {
     res.send({success: "Added " + travelImage.imageUrl + " successfully!"});
 });
 
+app.post('/create-comment', async (req, res) => {
+
+    const commentData = req.body;
+
+    if(!commentData.comment || !commentData.postId || !commentData.userId){
+        res.send({error: "Missing mandatory fields: " +
+            (!commentData.comment ? "imageUrl" : " ") +
+            (!commentData.postId ? "postId" : " ") + 
+            (!commentData.userId ? "userId":"")});
+        return;
+    }
+
+    const comment = await prisma.comment.create({
+        data : {
+            comment: commentData.comment,
+            postId: commentData.postId,
+            userId: commentData.userId
+        }
+    });
+
+    res.send({success: "Added " + comment.comment + " successfully!"});
+});
+
 //GET ENDPOINTS
 app.get('get-journal/:journalId', async (req,res) => {
     const journalId = parseInt(req.params.journalId);
@@ -108,7 +131,7 @@ app.get('get-comment/:commentId', async (req,res) => {
     const commentId = parseInt(req.params.commentId);
     
     const comment = await prisma.comment.findUnique({
-        where : { id: commenId }
+        where : { id: commentId }
     });
     res.send(comment);
 });
