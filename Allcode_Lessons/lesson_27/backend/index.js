@@ -25,14 +25,31 @@ app.post('/create-journal', async (req, res) => {
         return;
     }
 
-    const journal = await prisma.journal.create({
-        data : {
-            title: journalData.title,
-            description: journalData.description
-        }
-    });
+    try {
+        //Ensure the user exists before creating journal
+        const userExists = await prisma.user.findUnique({
+            where: { id:userId }
+        });
 
-    res.send({success: "Added " + journal.title + " successfully!"});
+        if(!userExists) {
+            return res.send({error: "User not found"});
+        }
+
+        const journal = await prisma.journal.create({
+            data : {
+                title: journalData.title,
+                description: journalData.description,
+                user : {
+                    connect: { id: userId }
+                }
+            }
+        });
+        
+        res.send({success: "Added " + journal.title + " successfully!"});
+    } catch (error) {
+        console.error(error);
+        res.send({error: "An error occurred while creating the journal"});
+    }
 });
 
 app.post('/create-post', async (req, res) => {
@@ -100,8 +117,63 @@ app.post('/create-comment', async (req, res) => {
     res.send({success: "Added " + comment.comment + " successfully!"});
 });
 
+app.post('/create-user', async (req, res) => {
+
+    const userData = req.body;
+   
+    if(!userData.email || !userData.firstname || !userData.lastname || !userData.password){
+        return res.status(400).json({error: "Missing mandatory fields: " + 
+            (!userData.email ? "email" : "") +
+            (!userData.firstname ? "firstname" : "") + 
+            (!userData.lastname ? "lastname" : "") + 
+            (!userData.password ? "password" : "")});    
+    }
+   
+    const existingUser = await prisma.users.findUnique({
+        where: {
+            email: userData.email
+        }
+    });
+   
+    if (existingUser) {
+        return res.status(400).json({ success: false, error: "Email already in use" });
+    }
+    
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[\W_]).+$/;
+
+    if(!passwordRegex.test(userData.password)) {
+        return res.status(400).json({error: "Password must contain at least one uppercase letter and a special character."});
+    }
+   
+    const user = await prisma.users.create({
+        data: {
+            email: userData.email,
+            firstname: userData.firstname,
+            lastname: userData.lastname,
+            password: userData.password
+        }
+    });
+    
+    res.send({success: "Added user with email " + user.email +" successfully"});
+});
+
+app.post("/login", async (req, res) => {
+    const { email, password } = req.body;
+
+    // Find user in database
+    const user = await prisma.users.findUnique({
+        where: { email },
+    });
+
+    if (!user || user.password !== password) {
+        return res.status(401).json({ success: false, error: "Invalid credentials" });
+    }
+
+    res.json({ success: true, user: { id: user.id, email: user.email, firstname: user.firstname, lastname: user.lastname } });
+});
+
 //GET ENDPOINTS
-app.get('get-journal/:journalId', async (req,res) => {
+app.get('/get-journal/:journalId', async (req,res) => {
     const journalId = parseInt(req.params.journalId);
     
     const journal = await prisma.journal.findUnique({
@@ -110,7 +182,12 @@ app.get('get-journal/:journalId', async (req,res) => {
     res.send(journal);
 });
 
-app.get('get-post/:postId', async (req,res) => {
+app.get('/get-all-journals', async (req,res) => {
+    const journals = await prisma.journal.findMany();
+    res.send(journals);
+});
+
+app.get('/get-post/:postId', async (req,res) => {
     const postId = parseInt(req.params.postId);
     
     const post = await prisma.post.findUnique({
@@ -119,7 +196,7 @@ app.get('get-post/:postId', async (req,res) => {
     res.send(post);
 });
 
-app.get('get-travelImage/:imageId', async (req,res) => {
+app.get('/get-travelImage/:imageId', async (req,res) => {
     const imageId = parseInt(req.params.imageId);
     
     const image = await prisma.image.findUnique({
@@ -128,7 +205,7 @@ app.get('get-travelImage/:imageId', async (req,res) => {
     res.send(image);
 });
 
-app.get('get-comment/:commentId', async (req,res) => {
+app.get('/get-comment/:commentId', async (req,res) => {
     const commentId = parseInt(req.params.commentId);
     
     const comment = await prisma.comment.findUnique({
@@ -137,10 +214,10 @@ app.get('get-comment/:commentId', async (req,res) => {
     res.send(comment);
 });
 
-app.get('get-user/:userId', async (req,res) => {
+app.get('/get-user/:userId', async (req,res) => {
     const userId = parseInt(req.params.userId);
     
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
         where : { id: userId }
     });
     res.send(user);

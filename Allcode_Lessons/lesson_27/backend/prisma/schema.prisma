@@ -24,7 +24,8 @@ model Journal {
   title String 
   description String
   posts Post[]
-  users Users[]
+  user Users @relation(fields: [userId], references: [id])
+  userId Int
   createdDate DateTime @default(now())
 }
 
@@ -57,10 +58,10 @@ model Comments {
 
 model Users {
   id Int @id @default(autoincrement())
-  email String
-  username String
+  email String @unique
+  firstname String
+  lastname String
   password String
   comment Comments[]
-  journal Journal @relation(fields: [journalId], references: [id])
-  journalId Int
+  journals Journal[] 
 }
