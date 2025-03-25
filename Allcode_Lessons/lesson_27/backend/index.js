@@ -17,30 +17,32 @@ app.listen(port, () => {
 app.post('/create-journal', async (req, res) => {
 
     const journalData = req.body;
+    console.log("Retrieved JournalData: ", journalData);
 
     if(!journalData.title || !journalData.description){
         res.send({error: "Missing mandatory fields: " +
             (!journalData.title ? "title " : " ") +
-            (!journalData.description ? "description" : "")});
+            (!journalData.description ? "description" : "")+
+            (!journalData.userId ? "userId" : "")});
         return;
     }
 
     try {
         //Ensure the user exists before creating journal
-        const userExists = await prisma.user.findUnique({
-            where: { id:userId }
+        const userExists = await prisma.users.findUnique({
+            where: { id:journalData.userId }
         });
 
         if(!userExists) {
             return res.send({error: "User not found"});
         }
-
+        
         const journal = await prisma.journal.create({
             data : {
                 title: journalData.title,
                 description: journalData.description,
                 user : {
-                    connect: { id: userId }
+                    connect: { id: journalData.userId }
                 }
             }
         });
@@ -162,7 +164,7 @@ app.post("/login", async (req, res) => {
 
     // Find user in database
     const user = await prisma.users.findUnique({
-        where: { email },
+        where: { email }
     });
 
     if (!user || user.password !== password) {
@@ -180,6 +182,15 @@ app.get('/get-journal/:journalId', async (req,res) => {
         where : { id: journalId }
     });
     res.send(journal);
+});
+
+app.get('/get-journals-from-user/:userId', async (req,res) => {
+    const userId = parseInt(req.params.userId);
+    const journals = await prisma.journal.findMany({
+        where : {userId : userId}
+    });
+
+    res.send(journals);
 });
 
 app.get('/get-all-journals', async (req,res) => {
@@ -225,6 +236,39 @@ app.get('/get-user/:userId', async (req,res) => {
 
 //UPDATE ENDPOINTS
 
+app.put('/update-journal/:journalId', async (req, res) => {
+    const journalId = parseInt(req.params.journalId, 10); 
+    const { title, description } = req.body;
+    
+    try {
+        
+        if (!title || !description) {
+            return res.status(400).json({ message: 'Title and description are required' });
+        }
 
+        const journal = await prisma.journal.update({
+            where: { id: journalId },
+            data: { title, description }, 
+        });
+
+        res.status(200).json({ message: 'Journal updated successfully', journal });
+    } catch (error) {
+       res.status(500).json({ message: 'Failed to update journal', error: error.message });
+    }
+});
 
 //DELETE ENDPOINTS
+
+app.delete('/delete-journal/:journalId', async (req,res) => {
+    const journalId = await parseInt(req.params.journalId,10);
+
+    try {
+        const journal = await prisma.journal.delete({
+            where: { id: journalId },
+            data: { title, description }
+        });
+        res.status(200).json({ message: 'Journal deleted successfully', journal });
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to delete journal', error: error.message });
+    }
+});

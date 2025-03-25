@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 export default function CreateJournal () {
     const navigate = useNavigate();
+    const { user } = useAuth();
+
     const [formData, setFormData] = useState({
         title: "",
         description: ""
@@ -20,9 +23,19 @@ export default function CreateJournal () {
 
     const submitJournal = async () => {
 
+        if(!user || !user.id){
+            setError("You must be logged in to create a journal.")
+            return;
+        }
+
+        const journalToSubmit = {
+            ...formData,
+            userId: user.id
+        };
+
         await fetch("http://localhost:4000/create-journal", {
             method: "POST",
-            body: JSON.stringify(formData),
+            body: JSON.stringify(journalToSubmit),
             headers: {
                 "Content-Type": "application/json"
             }
@@ -53,12 +66,14 @@ export default function CreateJournal () {
                     {error}
                 </p> : null
             }
-
-            <input name="title" value={formData.title} onChange={handleFormChange} placeholder="Title" className="p-2 border-2 broder-gray-200 rounded-xl" ></input>
-            <input name="description" value={formData.description} onChange={handleFormChange} placeholder="Description" className="p-2 border-2 broder-gray-200 rounded-xl"></input>
-            <button onClick={submitJournal} className="px-4 py-2 bg-blue-500 text-white rounded-xl">
-                Submit Journal
-            </button>
+            <div className="flex flex-col items-center">
+                <input name="title" value={formData.title} onChange={handleFormChange} placeholder="Title" className="p-2 border-2 broder-gray-200 rounded-xl w-100"></input>
+                <textarea name="description" value={formData.description} onChange={handleFormChange} placeholder="Description" className="text-justify mt-2 w-200 h-100 border-2 broder-gray-200 rounded-xl" style={{textAlign: 'left', paddingTop: '5px', paddingLeft: '5px'}}></textarea>
+                <button onClick={submitJournal} className="px-4 py-2 bg-blue-500 text-white rounded-xl">
+                    Submit Journal
+                </button>
+            </div>
+            
         </div>
     );
 }

@@ -1,25 +1,26 @@
 
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Journal () {
     
     const navigate = useNavigate();
+    const { user } = useAuth();
 
     const [journals, setJournals] = useState([]);
     
     useEffect(() => {
         const getJournals = async () => {
 
-            await fetch("http://localhost:4000/get-all-journals")
+            await fetch(`http://localhost:4000/get-journals-from-user/${user.id}`)
                 .then (async (data) => {
-    
                     const response = await data.json();
                     setJournals(response);
-                    console.log(journals);            
+                console.log(journals);            
                 }); 
         }
-
+        
         getJournals();
 
     },[]);
@@ -37,13 +38,13 @@ export default function Journal () {
                 </div>
             </div>
             <div className="grid gap-10 pt-8 max-w-4xl mx-auto">
-                {journals.map((journals,index) => (
+                {journals.map((journal,index) => (
                     <div className="border rounded-xl flex flex-col gap-4 " key={index}>
                         <h3 className="text-center text-2xl font-bold mx-auto px-2 py-1 mt-2">
-                            {journals.title}
+                            {journal.title}
                         </h3>
-                        <Link to={'/post/'+journals.id} className="bg-blue-200 px-4 py-2 text-center rounded-xl mb-2 mx-auto">
-                            View Journal
+                        <Link to={`/edit-journal/${journal.id}`} className="bg-blue-200 px-4 py-2 text-center rounded-xl mb-2 mx-auto">
+                            Edit Journal
                         </Link>
                     </div>
                 ))}
