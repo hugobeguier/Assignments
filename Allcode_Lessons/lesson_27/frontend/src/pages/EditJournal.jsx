@@ -61,18 +61,20 @@ export default function EditJournal() {
 
     return (
         <div>
-            <div className="flex">
-                <h1 className="mt-10 text-xl font-bold text-blue-400">Edit Journal</h1>
-                <button className="w-auto border rounded bg-red-400 hover:bg-red-200 " onClick={deleteJournal}>Delete Journal</button>
+            <div className="flex justify-between gap-8 mt-10">
+                <h1 className=" text-xl font-bold text-blue-400">Edit Journal</h1>
+                <div>
+                    <button className="w-auto border rounded bg-red-400 hover:bg-red-200 " onClick={deleteJournal}>Delete Journal</button>
+                </div>
             </div>
-
+            
             <div className="max-w-2xl mx-auto p-4 border rounded-xl bg-blue-200 z-0 mt-10">
                 <input
                     type="text"
                     name="title"
                     value={journal.title || ''} 
                     onChange={handleChange}
-                    className="w-full p-2 mb-4 text-xl border rounded"
+                    className="w-full p-2 mb-4 text-xl border rounded bg-white"
                 />
 
                 <div className="border rounded mt-4 z-10 bg-white">
