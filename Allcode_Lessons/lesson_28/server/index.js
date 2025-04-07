@@ -48,11 +48,12 @@ app.post('/register', async (req, res) => {
     const registerData = req.body;
 
     if (!registerData.email || !registerData.password || !registerData.fullName)
-    {
+    {   
+        
         res.send({ error: "You've left empty fields" });
         return;
     }
-
+  
     try {
         const hashedPassword = bcrypt.hashSync(registerData.password, 10);
     
@@ -69,7 +70,7 @@ app.post('/register', async (req, res) => {
         return;
     }
 
-    res.send({ success: "Your account has been created with " + user.email });
+    res.send({ success: "Your account has been created with " + registerData.email });
 
 });
 

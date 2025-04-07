@@ -8,7 +8,7 @@ export default function Register () {
     const [formData, setFormData] = useState({
         email: "",
         password: "",
-        name: ""
+        fullName: ""
     });
 
     const handleFormChange = (e) => {
@@ -55,7 +55,7 @@ export default function Register () {
             }
             <input name="email" value={formData.email} onChange={handleFormChange} placeholder="Email" type="email" className="border-2 border-gray-200 p-2 rounded-xl" />
             <input name="password" value={formData.password} onChange={handleFormChange} placeholder="Password" type="password" className="border-2 border-gray-200 p-2 rounded-xl" />
-            <input name="name" value={formData.fullName} onChange={handleFormChange} placeholder="Full Name" type="text" className="border-2 border-gray-200 p-2 rounded-xl" />
+            <input name="fullName" value={formData.fullName} onChange={handleFormChange} placeholder="Full Name" type="text" className="border-2 border-gray-200 p-2 rounded-xl" />
             <button onClick={register} className="bg-black text-white p-2 rounded-xl">Register!</button>
         </main>
     );
