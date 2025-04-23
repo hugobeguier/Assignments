@@ -106,6 +106,61 @@ app.post('/login', async (req, res) => {
 
 });
 
+app.post('/create-quiz',async(req,res) => {
+
+    const quizData = req.body; 
+
+    if (!quizData.quiz) {
+        return res.status(400).json({error: "Missing mandatory fields: " + 
+            (!quizData.quiz ? "quiz" :  "")
+        });
+    } 
+
+    const quiz = await prisma.quiz.create({
+        data: {
+            quiz: quizData.quiz
+        }
+    });
+
+    res.send({success: "Added quiz: '" + quiz.quiz + "' successfully"});
+}); 
+
+app.post('/post-answer', async(req,res) => {
+    const answerData = req.body;
+
+    if (!answerData.textField) {
+        return res.status(400).json({error : "Missing mandatory field: " + 
+            (!answerData.textField ? "textField" : "")
+        });
+    }
+
+    const answer = await prisma.answer.create({
+        data : {
+            textField: answerData.textField
+        }
+    });
+
+    res.send({success: "Answer is posted: '" + answer.textField +"'." });
+});
+
+app.post('/post-feedback', async(req,res) => {
+    const feedbackData = req.body;
+
+    if (!feedbackData.comment) {
+        return res.status(400).json({error: "Missing mandatory field: " + 
+            (!feedbackData.comment ? "comment" : "")
+        });
+    } 
+
+    const feedback = await prisma.feedback.create({
+        data : {
+            comment: feedbackData.comment
+        }
+    })
+
+    res.send({success: "Feedback posted: '" + feedback.comment +"'."});
+});
+
 app.listen(port, () => {
     console.log("Server is running on port ", port);
 });

@@ -13,11 +13,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
   id Int @id @default(autoincrement())
   email String @unique
   password String
   fullName String 
+  answers Answer[] @relation("UserAnswers")
 }
 
+model Quiz {
+  id Int @id @default(autoincrement())
+  quiz String
+}
+
+model Answer {
+  id Int @id @default(autoincrement())
+  textField String
+  user User[] @relation("UserAnswers")
+  createdDate DateTime @default(now())
+  feedback Feedback[] @relation("UserFeedback")
+}
+
+model Feedback {
+  id Int @id @default(autoincrement())
+  comment String
+  answer Answer[] @relation("UserFeedback")
+}
