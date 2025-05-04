@@ -12,30 +12,32 @@ export default function Home () {
 
     }
 
-    useEffect(() => {
+    useEffect
 
-        const getSecret = async () => {
+    // useEffect(() => {
 
-            await fetch("http://localhost:4000/secret-sauce", {
-                method: "GET",
-                headers: {
-                    "x-access-token": localStorage.getItem("token")
-                }
-            }).then(async (data) => {
+    //     const getSecret = async () => {
 
-                const response = await data.json();
+    //         await fetch("http://localhost:4000/secret-sauce", {
+    //             method: "GET",
+    //             headers: {
+    //                 "x-access-token": localStorage.getItem("token")
+    //             }
+    //         }).then(async (data) => {
 
-                if (response.secretSauce) {
-                    setSecret(response.secretSauce);
-                }
+    //             const response = await data.json();
 
-            });
+    //             if (response.secretSauce) {
+    //                 setSecret(response.secretSauce);
+    //             }
 
-        };
+    //         });
 
-        getSecret();
+    //     };
 
-    }, []);
+    //     getSecret();
+
+    // }, []);
 
     return (
         <main className="flex flex-col gap-6 px-24 py-8">
