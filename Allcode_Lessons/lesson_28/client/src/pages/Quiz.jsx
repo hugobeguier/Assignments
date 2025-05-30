@@ -36,8 +36,6 @@ export default function Quiz () {
                     <button to="/answers" className="border rounded bg-red-200 p-1 m-1 ">View other people answers</button>
                 </div>
             </div>
-            
-            
         </div>
     );
 }
