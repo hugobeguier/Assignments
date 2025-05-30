@@ -29,18 +29,33 @@ const verifyToken = (req, res, next) => {
 
 };
 
-app.get('/secret-sauce', verifyToken, async (req, res) => {
+// app.get('/secret-sauce', verifyToken, async (req, res) => {
     
-    const userId = req.userId;
+//     const userId = req.userId;
 
-    const user = await prisma.user.findUnique({
-        where: { id: userId },
+//     const user = await prisma.user.findUnique({
+//         where: { id: userId },
+//     });
+
+//     const secretSauce = "Smiling more.";
+
+//     res.send({ secretSauce: secretSauce, email: user.email });
+
+// });
+
+app.get('/get-quizzes', async (req, res) => {
+    const quizzes = await prisma.quiz.findMany();
+    res.send(quizzes);
+});
+
+app.get('/get-quiz/:id', async (req, res) => {
+    const quizId = parseInt(req.params.id);
+    
+    const quiz = await prisma.quiz.findUnique({
+        where: {id: quizId}
     });
-
-    const secretSauce = "Smiling more.";
-
-    res.send({ secretSauce: secretSauce, email: user.email });
-
+    
+    res.send(quiz);
 });
 
 app.post('/register', async (req, res) => {
@@ -110,19 +125,21 @@ app.post('/create-quiz',async(req,res) => {
 
     const quizData = req.body; 
 
-    if (!quizData.quiz) {
+    if (!quizData.quiz || !quizData.title) {
         return res.status(400).json({error: "Missing mandatory fields: " + 
-            (!quizData.quiz ? "quiz" :  "")
+            (!quizData.quiz ? "quiz" :  "") +
+            (!quizData.title ? "title" :  "")
         });
     } 
 
     const quiz = await prisma.quiz.create({
         data: {
-            quiz: quizData.quiz
+            quiz: quizData.quiz,
+            title: quizData.title
         }
     });
 
-    res.send({success: "Added quiz: '" + quiz.quiz + "' successfully"});
+    res.send({success: "Added quiz: '" + quiz.title + "' successfully"});
 }); 
 
 app.post('/post-answer', async(req,res) => {
@@ -164,3 +181,4 @@ app.post('/post-feedback', async(req,res) => {
 app.listen(port, () => {
     console.log("Server is running on port ", port);
 });
+

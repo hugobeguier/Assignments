@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Form, useParams } from "react-router-dom";
+import { Form, Link, useParams } from "react-router-dom";
 
 
 export default function Quiz () {
@@ -11,7 +11,7 @@ export default function Quiz () {
         - When writing feedback the feedback will be a popup that the user can see on their profile 
         - Make a "check answer button" pop up where you can see other users answers
     */
-
+    
     useEffect (() => {
         const getQuiz = async () => {
             await fetch(`http://localhost:4000/get-quiz/${id}`)
@@ -27,13 +27,17 @@ export default function Quiz () {
    
     return (
         <div>
-            <h1>{quiz.title}</h1>
-            <p>{quiz.quiz}</p>
-            <textarea>
-            {/* set Answer object */}
-            </textarea>
-            <button>Send answer</button>
-            <button>View other people answers</button>
+            <h1 className="text-4xl font-semibold text-center">{quiz.title}</h1>
+            <div className="grid gap-2 flex flex-col m-4 ml-2 justify-center">
+                <p className="ml-2 font-semibold">{quiz.quiz}</p>
+                <textarea name="answer" placeholder="Answer..." className="text-justify mt-2 w-200 h-100 border-2 broder-gray-200 rounded-xl" style={{textAlign: 'left', paddingTop: '5px', paddingLeft: '5px'}}></textarea>
+                <div className="">
+                    <Link to="/" className="border rounded bg-blue-200 p-1 m-1">Send answer</Link>
+                    <button to="/answers" className="border rounded bg-red-200 p-1 m-1 ">View other people answers</button>
+                </div>
+            </div>
+            
+            
         </div>
     );
 }
