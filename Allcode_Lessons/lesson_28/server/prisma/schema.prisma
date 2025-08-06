@@ -25,18 +25,20 @@ model Quiz {
   id Int @id @default(autoincrement())
   quiz String
   title String
+  answers Answer[] @relation("QuizAnswers")
 }
 
 model Answer {
   id Int @id @default(autoincrement())
   textField String
-  user User[] @relation("UserAnswers")
+  userId Int
+  user User @relation(fields: [userId], references: [id], name: "UserAnswers")
   createdDate DateTime @default(now())
-  feedback Feedback[] @relation("UserFeedback")
+  quizId Int
+  quiz Quiz @relation(fields: [quizId], references: [id], name: "QuizAnswers")
 }
 
 model Feedback {
   id Int @id @default(autoincrement())
   comment String
-  answer Answer[] @relation("UserFeedback")
 }

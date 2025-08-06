@@ -4,6 +4,7 @@ const { PrismaClient } = require("@prisma/client");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
+
 const app = express();
 const prisma = new PrismaClient();
 const port = 4000;
@@ -29,23 +30,33 @@ const verifyToken = (req, res, next) => {
 
 };
 
-// app.get('/secret-sauce', verifyToken, async (req, res) => {
+app.get('/answer-quizzes', verifyToken, async (req, res) => {
     
-//     const userId = req.userId;
+     const userId = req.userId;
 
-//     const user = await prisma.user.findUnique({
-//         where: { id: userId },
-//     });
+     const user = await prisma.user.findUnique({
+         where: { id: userId },
+     });
 
-//     const secretSauce = "Smiling more.";
+     const answerQuizzes = "yes";
 
-//     res.send({ secretSauce: secretSauce, email: user.email });
+     res.send({ answerQuizzes: answerQuizzes, email: user.email });
 
-// });
+});
 
 app.get('/get-quizzes', async (req, res) => {
     const quizzes = await prisma.quiz.findMany();
     res.send(quizzes);
+});
+
+app.get('/get-User/:id', async (req, res) => {
+    const userId = parseInt(req.params.id);
+
+    const user = await prisma.user.findUnique({
+        where: {id: userId}
+    });
+
+    res.send(user);
 });
 
 app.get('/get-quiz/:id', async (req, res) => {
@@ -55,7 +66,41 @@ app.get('/get-quiz/:id', async (req, res) => {
         where: {id: quizId}
     });
     
+    if (!quiz) {
+        return res.status(400).json({error: "Quiz not found"});
+    }
+
     res.send(quiz);
+});
+
+app.get('/has-user-answered-quiz/:quizId', async (req, res) => {
+    const quizId = parseInt(req.params.quizId);
+
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer")) {
+        return res.status(401).json({ error: "No token provided" });
+    }
+
+    const token = authHeader.split(" ")[1]; 
+
+    let userId;
+    try {
+        const decoded = jwt.verify(token, process.env.SECRET_KEY);
+        userId = decoded.userId;
+    } catch (err) {
+        return res.status(401).json({ error: "Invalid token" });
+    }
+
+    const answer = await prisma.answer.findFirst({
+        where: {
+            quizId: quizId,
+            userId: userId,
+        },
+    });
+
+
+    return res.json({ hasAnswered: !!answer });
 });
 
 app.post('/register', async (req, res) => {
@@ -143,21 +188,29 @@ app.post('/create-quiz',async(req,res) => {
 }); 
 
 app.post('/post-answer', async(req,res) => {
-    const answerData = req.body;
+    
+    try {
+         const answerData = req.body;
 
-    if (!answerData.textField) {
-        return res.status(400).json({error : "Missing mandatory field: " + 
+        if (!answerData.textField) {
+            return res.status(400).json({error : "Missing mandatory field: " + 
             (!answerData.textField ? "textField" : "")
-        });
-    }
-
-    const answer = await prisma.answer.create({
-        data : {
-            textField: answerData.textField
+            });
         }
-    });
+        const answer = await prisma.answer.create({
+            data : {
+                textField: answerData.textField,
+                userId: parseInt(answerData.userId),
+                quizId: parseInt(answerData.quizId)
+            }
+        });
 
-    res.send({success: "Answer is posted: '" + answer.textField +"'." });
+        res.send({success: "Answer is posted: '" + answer.textField +"'." });
+    } catch (err) {
+        console.error("Error in /post-answer: ", err);
+        res.status(500).json({error: "Internal server error"});
+    }
+   
 });
 
 app.post('/post-feedback', async(req,res) => {

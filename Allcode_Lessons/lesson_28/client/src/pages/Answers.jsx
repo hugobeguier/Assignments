@@ -1,19 +1,13 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-import Answers from "./Answers";
 
-export default function Quiz ({ canAnswerQuizzes, logout }) {
+export default function Answers ({ canAnswerQuizzes, logout }) {
    
-    
-    const navigate = useNavigate();
     const { id } = useParams();
     const [quiz, setQuiz] = useState([]);
-    const [answer, setAnswer] = useState("");
-    const [userId, setUserId] = useState(null);
-    const [hasAnswered, setHasAnswered] = useState(false);
-   
-
+    const [answer, setAnswer] = useState([]);
+    const [userId, setUserId] = useState([null]);
 
     useEffect (() => {
         const getQuiz = async () => {
@@ -33,26 +27,8 @@ export default function Quiz ({ canAnswerQuizzes, logout }) {
         }
 
     },[id]);
-    
-    useEffect (() => {
-        if (!quiz.id || !userId) return;
 
-        const getHasAnswered = async () => {
-            const response = await fetch(`http://localhost:4000/has-user-answered-quiz/${quiz.id}`, {
-                method: "GET",
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            });
-            const data = await response.json();
-            setHasAnswered(data.hasAnswered);
-        };
-
-        getHasAnswered();
-
-    }, [quiz.id, userId]);
-
-   const submitAnswer = async () => {
+   const sendAnswer = async () => {
         if(!userId) {
             alert("You need to be logged in to submit an answer.");
         }
@@ -73,7 +49,6 @@ export default function Quiz ({ canAnswerQuizzes, logout }) {
         .then ((data) => {
             if (data.success) {
                 alert("Your answer has been submitted!");
-                navigate("/");
             }
             else {
                 alert("Error submitting your answer.");
@@ -84,7 +59,7 @@ export default function Quiz ({ canAnswerQuizzes, logout }) {
             alert("An error occurred");
         });
    };
-
+   
     return (
         <main>
             <div className="">
@@ -113,27 +88,14 @@ export default function Quiz ({ canAnswerQuizzes, logout }) {
                 <h1 className="text-4xl font-semibold text-center">{quiz.title}</h1>
                 <div className="grid gap-2 flex flex-col m-4 ml-2 justify-center">
                     <p className="ml-2 font-semibold">{quiz.quiz}</p>
-                    
-
                     {canAnswerQuizzes ? (
-
-                        hasAnswered ? (
                         <div>
-                            <textarea disabled value={answer} onChange={(e) => setAnswer(e.target.value)} name="answer" placeholder="You have already answered this quiz" className="text-justify mt-2 w-200 h-100 border-2 broder-gray-900 rounded-xl" style={{textAlign: 'left', paddingTop: '5px', paddingLeft: '5px'}}></textarea>
+                            <textarea value={answer} onChange={(e) => setAnswer(e.target.value)} name="answer" placeholder="Answer..." className="text-justify mt-2 w-200 h-100 border-2 broder-gray-200 rounded-xl" style={{textAlign: 'left', paddingTop: '5px', paddingLeft: '5px'}}></textarea>
                             <div className="">
-                                <Link disabled={!submitAnswer} className="border rounded bg-gray-200 p-1 m-1">Submit answer</Link>
+                                <Link onClick={sendAnswer} className="border rounded bg-blue-200 p-1 m-1">Submit answer</Link>
                                 <button to="/answers" className="border rounded bg-red-200 p-1 m-1 ">View other people answers</button>
                             </div>
-                        </div>  
-                        ) : (<div>
-                            
-                            <textarea value={answer} onChange={(e) => setAnswer(e.target.value)} name="answer" placeholder="Answer..." className="text-justify mt-2 w-200 h-100 border-2 broder-gray-900 rounded-xl" style={{textAlign: 'left', paddingTop: '5px', paddingLeft: '5px'}}></textarea>
-                            <div className="">
-                                <Link onClick={submitAnswer} className="border rounded bg-blue-200 p-1 m-1">Submit answer</Link>
-                                <button to="/answers" className="border rounded bg-red-200 p-1 m-1 ">View other people answers</button>
-                            </div>
-                        </div>
-                        )
+                        </div>    
                     ) : (
                         <p className="font-semibold p-1 m-1">You need to log in or register to answer this quiz</p>
                     )}

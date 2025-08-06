@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-export default function Login () {
+export default function Login ({ setCanAnswerQuizzes }) {
 
     const navigate = useNavigate();
-
+    
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
@@ -12,27 +12,31 @@ export default function Login () {
 
     const login = async () => {
 
-        await fetch("http://localhost:4000/login", {
+        try {
+            const response = await fetch("http://localhost:4000/login", {
             method: "POST",
             body: JSON.stringify({ email: email, password: password }),
             headers: {
                 "Content-Type": "application/json"
-            }
-        }).then(async (data) => {
-
-            const response = await data.json();
-
-            if (response.token) {
-                localStorage.setItem("token", response.token);
-                navigate("/");
-            } else if (response.error) {
-                setError(response.error);
-            } else {
-                setError("Something went wrong, please try again later.");
-            }
-
+            },
         });
-    
+        
+        const data = await response.json();
+
+        if (data.token) {
+            localStorage.setItem("token", data.token);
+            setCanAnswerQuizzes("yes"); 
+            navigate("/");
+        } else if (data.error) {
+            setError(data.error);
+        } else {
+            setError("Something went wrong, please try again later.");
+        }
+
+        } catch (err) {
+            setError("Server error.");
+            console.error(err);
+        } 
     };
 
     return (
@@ -41,6 +45,10 @@ export default function Login () {
             <p>
                 Login to your account!
             </p>
+            <p>
+                Don't have an account? 
+            </p>
+            <Link to={`/register`} className="text-green-500" >Register here</Link>
             {error ?
                 <p className="bg-red-500 text-white p-4 rounded-xl">
                     {error}
