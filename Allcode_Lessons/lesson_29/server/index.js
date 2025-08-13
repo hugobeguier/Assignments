@@ -3,10 +3,12 @@ const cors = require("cors");
 const { PrismaClient } = require("@prisma/client");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-
+const emailValidator = require("email-validator");
+const passwordValidator = require("password-validator");
 
 const app = express();
 const prisma = new PrismaClient();
+const schema = new passwordValidator();
 const port = 4000;
 
 app.use(express.json());
@@ -30,14 +32,29 @@ const verifyToken = (req, res, next) => {
 
 };
 
-app.get('/get-User/:id', verifyToken, async (req, res) => {
+app.get('/getCurrentUser', verifyToken, async (req, res) => {
     const userId = parseInt(req.params.id);
     
     const user = await prisma.user.findUnique({
         where: {id: userId}
     });
 
+    if (!user) {
+        res.send({ error: "User not found." });
+        return;
+    }
+
     res.send(user);
+});
+
+app.get('/getNotes', verifyToken, async (req, res) => {
+    const userId = parseInt(req.params.id);
+
+    const notes = await prisma.notes.findMany({
+        where : {userId: userId}
+    });
+
+    res.send(`Successfully found notes for user with id ${userid}`);
 });
 
 app.post('/register', async (req, res) => {
@@ -50,11 +67,48 @@ app.post('/register', async (req, res) => {
         res.send({ error: "You've left empty fields" });
         return;
     }
-  
+
+    const emailValid = emailValidator.validate(registerData.email);
+    if (!emailValid) {
+        res.send({ error: "The email you submitted is not valid"});
+        return;
+    }
+
+   schema
+        .is().min(8)                                    // Minimum length 8
+        .is().max(100)                                  // Maximum length 100
+        .has().uppercase()                              // Must have uppercase letters
+        .has().lowercase()                              // Must have lowercase letters
+        .has().digits(2)                                // Must have at least 2 digits
+        .has().not().spaces()                           // Should not have spaces
+        .is().not().oneOf(['Passw0rd', 'Password123','Test123#']);
+
+    const passwordValid = schema.validate(registerData.password);
+
+    if (!passwordValid) {
+        res.send({ error: "Your password is not safe, please include 8 characters with upper and lower case letters, and numbers." });
+        return;
+    }
+
+    if (registerData.fullName.length < 4) {
+        res.send({ error: "Your full name must be at least 4 characters"});
+        return;
+    }
+
+    const emailExists = await prisma.user.findUnique({
+        where : {email: registerData.email}
+    });
+
+    if (emailExists) {
+        res.send({ error: "Email already exists."});
+        return;
+    }
+
+    let user;
     try {
         const hashedPassword = bcrypt.hashSync(registerData.password, 10);
     
-        const user = await prisma.user.create({
+        user = await prisma.user.create({
             data: {
                 email: registerData.email,
                 password: hashedPassword,
@@ -67,7 +121,7 @@ app.post('/register', async (req, res) => {
         return;
     }
 
-    res.send({ success: "Your account has been created with " + registerData.email });
+    res.send({ success: "Your account has been created with " + user.email });
 
 });
 
