@@ -1,13 +1,10 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function Home () {
 
     const [notes, setNotes] = useState([]);
     const [user, setUser] = useState({});
-    const [note, setNote] = useState(""); 
-    const [error, setError] = useState("");
-    const navigate = useNavigate(); 
 
     const logout = () => {
         localStorage.removeItem("token");
@@ -41,29 +38,6 @@ export default function Home () {
         getNotes();
         getUser();
     }, []);
-
-//   const CreateNewNote = async () => {
-//         const res = await fetch("http://localhost:4000/create-note", {
-//         method: "POST",
-//         body: JSON.stringify({ textArea: note }), 
-//         headers: {
-//             "Content-Type": "application/json",
-//             "x-access-token": localStorage.getItem("token") 
-//         }
-//     });
-
-//     const response = await res.json();
-
-//         if (response.success) {
-//             navigate("/add-note");
-
-//         } else if (response.error) {
-//             setError(response.error);
-//             setNote("");
-//         } else {
-//             setError("Something went wrong with your request.");
-//         }
-//     };
 
     return (
         <main className="flex flex-col gap-6 px-24 py-8">

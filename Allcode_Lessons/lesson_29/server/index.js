@@ -14,6 +14,14 @@ const port = 4000;
 app.use(express.json());
 app.use(cors());
 
+
+ function getInitials (fullName = "") {
+        const parts = fullName.trim().split(/\s+/);
+        const first = parts[0]?.[0] || "";
+        const last = parts.length > 1 ? parts[parts.length - 1]?.[0] : "";
+         return (first + last).toUpperCase();
+    }
+
 const verifyToken = (req, res, next) => {
 
     const token = req.headers["x-access-token"];
@@ -33,73 +41,76 @@ const verifyToken = (req, res, next) => {
 };
 
 app.get('/getCurrentUser', verifyToken, async (req, res) => {
-  const userId = req.userId;
+    const userId = req.userId;
 
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { id: true, fullName: true, email: true } // avoid sending password hash
-  });
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { id: true, fullName: true, email: true, initials: true } // avoid sending password hash
+    });
 
-  if (!user) return res.status(404).send({ error: "User not found." });
+    if (!user) return res.status(404).send({ error: "User not found." });
 
-  res.send({ user });
+    res.send({ user });
 });
 
 app.get('/getNotes', verifyToken, async (req, res) => {
-  const userId = req.userId;
+    const assigneeId = req.assigneeId;
 
-  const notes = await prisma.notes.findMany({ // or prisma.note depending on your schema
-    where: { userId }
-  });
+    const notes = await prisma.notes.findMany({ 
+        where: { assigneeId }
+    });
 
-  res.send({ notes });
+    res.send({ notes });
 });
 
-app.post('/create-note', verifyToken, async (req, res) => {
-  const userId = req.userId;
-  const { textArea } = req.body;
+app.post('/createNote', verifyToken, async (req, res) => {
+    const assigneeId = req.assigneeId;
+    const { noteData } = req.body.noteData;
 
-  if (!textArea) return res.send({ error: "You must submit some kind of text." });
-  if (textArea.length < 10) return res.send({ error: "Your note must be at least 10 characters." });
+    if (!noteData.title) return res.send({ error: "You must submit a title to your note."});
+    if (!noteData.description) return res.send({ error: "You must submit some kind of text in the description." });
+    if (noteData.description.length < 10) return res.send({ error: "Your note must be at least 10 characters." });
 
-  const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user) return res.send({ error: "User not found." });
+    const user = await prisma.user.findUnique({ where: { id: assigneeId } });
+    if (!user) return res.send({ error: "User not found." });
 
-  await prisma.notes.create({
-    data: {
-      textArea,
-      user: { connect: { id: userId } }
-    }
-  });
+    await prisma.notes.create({
+        data: {
+            title: noteData.title,
+            description: noteData.description,
+            dueDate: noteData.dueDate,
+            status: noteData.status,            
+            user: { connect: { id: assigneeId } }
+        }
+    });
 
-  res.send({ success: "Your note has been added successfully" });
+    res.send({ success: "Your note has been added successfully" });
 });
 
 app.post('/register', async (req, res) => {
 
     const registerData = req.body;
 
-    if (!registerData.email || !registerData.password || !registerData.fullName)
-    {   
-        
+    if (!registerData.email || !registerData.password || !registerData.fullName) {
+
         res.send({ error: "You've left empty fields" });
         return;
     }
 
     const emailValid = emailValidator.validate(registerData.email);
     if (!emailValid) {
-        res.send({ error: "The email you submitted is not valid"});
+        res.send({ error: "The email you submitted is not valid" });
         return;
     }
 
-   schema
+    schema
         .is().min(8)                                    // Minimum length 8
         .is().max(100)                                  // Maximum length 100
         .has().uppercase()                              // Must have uppercase letters
         .has().lowercase()                              // Must have lowercase letters
         .has().digits(2)                                // Must have at least 2 digits
         .has().not().spaces()                           // Should not have spaces
-        .is().not().oneOf(['Passw0rd', 'Password123','Test123#']);
+        .is().not().oneOf(['Passw0rd', 'Password123', 'Test123#']);
 
     const passwordValid = schema.validate(registerData.password);
 
@@ -109,28 +120,31 @@ app.post('/register', async (req, res) => {
     }
 
     if (registerData.fullName.length < 4) {
-        res.send({ error: "Your full name must be at least 4 characters"});
+        res.send({ error: "Your full name must be at least 4 characters" });
         return;
     }
 
     const emailExists = await prisma.user.findUnique({
-        where : {email: registerData.email}
+        where: { email: registerData.email }
     });
 
     if (emailExists) {
-        res.send({ error: "Email already exists."});
+        res.send({ error: "Email already exists." });
         return;
     }
+
+   const initials = getInitials(registerData.fullName);
 
     let user;
     try {
         const hashedPassword = bcrypt.hashSync(registerData.password, 10);
-    
+
         user = await prisma.user.create({
             data: {
                 email: registerData.email,
                 password: hashedPassword,
-                fullName: registerData.fullName
+                fullName: registerData.fullName,
+                initials: initials
             }
         });
     } catch (error) {
