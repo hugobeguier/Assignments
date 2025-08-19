@@ -23,9 +23,11 @@ model User {
 
 model Notes {
   id Int @id @default(autoincrement())
-  textArea String
+  title String
+  description String
+  dueDate DateTime?
   created DateTime @default(now())
-  lastUpdate DateTime
-  userId Int
-  user User @relation(fields: [userId], references: [id], name: "User")
+  assigneeId Int
+  user User @relation(fields: [assigneeId], references: [id], name: "User")
+  status String
 }

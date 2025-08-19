@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Home () {
-    
+
     const [notes, setNotes] = useState([]);
     const [user, setUser] = useState({});
+    const [note, setNote] = useState(""); 
+    const [error, setError] = useState("");
+    const navigate = useNavigate(); 
 
     const logout = () => {
         localStorage.removeItem("token");
@@ -12,65 +15,55 @@ export default function Home () {
         setUser({});
     }
 
-    useEffect (() => {
-
-        const getNotes = async () => {
-            await fetch("http://localhost:4000/getNotes", {
-                method: "GET",
-                headers: {
-                    "x-access-token": localStorage.getItem("token")
-                }
-            }).then(async(data) => {
-                const response = await data.json();
-
-                if (response.notes) {
-                    setNotes(response.notes);
-                } 
-            })
+    useEffect(() => {
+    const getNotes = async () => {
+        const res = await fetch("http://localhost:4000/getNotes", {
+        method: "GET",
+        headers: {
+            "x-access-token": localStorage.getItem("token")
         }
+        });
+        const response = await res.json();
+        if (response.notes) setNotes(response.notes);
+    };
 
-        const getUser = async () => {
-            await fetch("http://localhost:4000/getCurrentUser", {
-                method: "GET",
-                headers: {
-                    "x-access-token": localStorage.getItem("token")
-                }
-            }).then(async(data) => {
-                const response = await data.json();
-                
-                if (response.user) {
-                    setUser(response.user);
-                }
-            })
+    const getUser = async () => {
+      const res = await fetch("http://localhost:4000/getCurrentUser", {
+        method: "GET",
+        headers: {
+            "x-access-token": localStorage.getItem("token")
         }
+        });
+        const response = await res.json();
+        if (response.user) setUser(response.user);
+        };
 
         getNotes();
         getUser();
-
     }, []);
 
-    const CreateNewNote = async () => {
-        await fetch("http://localhost:4000/create-note", {
-            method: "POST",
-            body: JSON.stringify({ notes: note }),
-            headers: {
-                "Content-Type": "application/json",
-                "x-access-token": localStorage.getItem("Token")
-            }
-        }).then(async(data) => {
-            const response = await data.json();
+//   const CreateNewNote = async () => {
+//         const res = await fetch("http://localhost:4000/create-note", {
+//         method: "POST",
+//         body: JSON.stringify({ textArea: note }), 
+//         headers: {
+//             "Content-Type": "application/json",
+//             "x-access-token": localStorage.getItem("token") 
+//         }
+//     });
 
-            if (response.success) {
-                navigate("/add-note");
-            } else if (response.error) {
-                SpeechSynthesisErrorEvent(response.error);
-                setNotes("");
-            } else {
-                setError("Something went wrong with your request.");
-            }
+//     const response = await res.json();
 
-        });
-    };
+//         if (response.success) {
+//             navigate("/add-note");
+
+//         } else if (response.error) {
+//             setError(response.error);
+//             setNote("");
+//         } else {
+//             setError("Something went wrong with your request.");
+//         }
+//     };
 
     return (
         <main className="flex flex-col gap-6 px-24 py-8">
@@ -79,7 +72,7 @@ export default function Home () {
                     Your Notes
                 </h1>
                 {user.id ? 
-                    <Link onClick={CreateNewNote}>Add Note</Link>
+                    <Link to={"/createNote"}>Add Note</Link>
                     : null
                 }
             </div>

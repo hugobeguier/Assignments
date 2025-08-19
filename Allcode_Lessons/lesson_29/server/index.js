@@ -33,28 +33,46 @@ const verifyToken = (req, res, next) => {
 };
 
 app.get('/getCurrentUser', verifyToken, async (req, res) => {
-    const userId = parseInt(req.params.id);
-    
-    const user = await prisma.user.findUnique({
-        where: {id: userId}
-    });
+  const userId = req.userId;
 
-    if (!user) {
-        res.send({ error: "User not found." });
-        return;
-    }
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, fullName: true, email: true } // avoid sending password hash
+  });
 
-    res.send(user);
+  if (!user) return res.status(404).send({ error: "User not found." });
+
+  res.send({ user });
 });
 
 app.get('/getNotes', verifyToken, async (req, res) => {
-    const userId = parseInt(req.params.id);
+  const userId = req.userId;
 
-    const notes = await prisma.notes.findMany({
-        where : {userId: userId}
-    });
+  const notes = await prisma.notes.findMany({ // or prisma.note depending on your schema
+    where: { userId }
+  });
 
-    res.send(`Successfully found notes for user with id ${userid}`);
+  res.send({ notes });
+});
+
+app.post('/create-note', verifyToken, async (req, res) => {
+  const userId = req.userId;
+  const { textArea } = req.body;
+
+  if (!textArea) return res.send({ error: "You must submit some kind of text." });
+  if (textArea.length < 10) return res.send({ error: "Your note must be at least 10 characters." });
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) return res.send({ error: "User not found." });
+
+  await prisma.notes.create({
+    data: {
+      textArea,
+      user: { connect: { id: userId } }
+    }
+  });
+
+  res.send({ success: "Your note has been added successfully" });
 });
 
 app.post('/register', async (req, res) => {
@@ -156,44 +174,6 @@ app.post('/login', async (req, res) => {
     });
 
 });
-
-app.post('/create-note', verifyToken, async (req, res) => {
-    const userId = req.userId;
-    const noteData = req.body;
-
-    if (!noteData.textArea) {
-        res.send({ error: "You must submit some kind of text."});
-        return;
-    }
-
-    if (noteData.textArea.length < 10) {
-        res.send({ error: "Your note must be at least 10 characters."});
-        return;
-    }
-
-    const user = await prisma.user.findUnique({
-        where : { id: userId }
-    });
-
-    if (!user) {
-        res.send({ error: "User not found."});
-        return;
-    }
-
-    const note = await prisma.notes.create({
-        data: {
-            textArea: noteData.textArea,
-            user: {
-                connect: {
-                    id: userId
-                }
-            }
-        }
-    });
-
-    res.send({ success: "Your note has been added successfully"});
-});
-
 
 app.listen(port, () => {
     console.log("Server is running on port ", port);
