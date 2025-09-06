@@ -15,7 +15,7 @@ export default function Note() {
     const [error, setError] = useState("");
     const [user, setUser] = useState({});
     const navigate = useNavigate();
-
+   
     const handleChange = (e) => {
         const { name, value } = e.target;
         setNote((prev) => ({ ...prev, [name]: value }));
@@ -44,6 +44,7 @@ export default function Note() {
 
 
     const CreateNewNote = async () => {
+      
         const res = await fetch("http://localhost:4000/createNote", {
             method: "POST",
             body: JSON.stringify({ noteData: note }),
@@ -52,7 +53,6 @@ export default function Note() {
                 "x-access-token": localStorage.getItem("token")
             }
         });
-
         const response = await res.json();
 
         if (response.success) {
@@ -79,7 +79,7 @@ export default function Note() {
 
             <div className="mx-auto mt-8 max-w-4xl">
                 <div className="rounded-2xl border bg-white shadow-sm">
-                    <form onSubmit={CreateNewNote} className="grid grid-cols-1 gap-6 p-5 lg:grid-cols-[1fr_280px]">
+                    <form onSubmit={(e) => {e.preventDefault(); CreateNewNote();}} className="grid grid-cols-1 gap-6 p-5 lg:grid-cols-[1fr_280px]">
                         <div className="space-y-4">
                             <div>
                                 <label htmlFor="title" className="mb-1 block text-sm font-medium text-gray-700">

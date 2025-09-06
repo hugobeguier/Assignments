@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import NoteModal from "./NoteModal";
 
 export default function Home () {
 
     const [notes, setNotes] = useState([]);
     const [user, setUser] = useState({});
+    const [selectedNote, setSelectedNote] = useState(null);
 
     const logout = () => {
         localStorage.removeItem("token");
@@ -39,6 +41,14 @@ export default function Home () {
         getUser();
     }, []);
 
+    const openNote = (note) => setSelectedNote(note);
+    const closeNote = () => setSelectedNote(null);
+
+    const handleSaved = (updated) => {
+        setNotes((prev) => prev.map((n) => (n.id === updated.id ? updated : n)));
+        setSelectedNote(updated);
+    };
+
     return (
         <main className="flex flex-col gap-6 px-24 py-8">
             <div className="flex justify-between">
@@ -56,9 +66,16 @@ export default function Home () {
                     {notes.length > 0 ?
                         <div className="flex flex-col gap-6">
                             {notes.map((note, index) => (
-                                <div className="bg-gray-300 p-6 rounded-xl" key={index}>
-                                    <p>{note.textArea}</p>
-                                </div>   
+                                <button
+                                    key={note.id ?? note.title} 
+                                    onClick={() => openNote(note)}
+                                    className="rounded-xl bg-gray-100 p-4 text-left transition hover:bg-gray-200"
+                                >
+                                    <p className="font-medium">{note.title}</p>
+                                    <p className="text-sm text-gray-600">
+                                    Due: {note.dueDate ? new Date(note.dueDate).toLocaleDateString("en-CA") : "No due date"}
+                                    </p>
+                                </button>  
                             ))}
                         </div>
                         : <p> You have not added any notes yet. </p>                     
@@ -78,6 +95,15 @@ export default function Home () {
                         )
                     }
             </div>
+           
+            {selectedNote && (
+                <NoteModal
+                    note={selectedNote}
+                    user={user}
+                    onClose={closeNote}
+                    onSaved={handleSaved}
+                />
+            )}
         </main>
     );
 }

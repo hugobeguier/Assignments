@@ -54,7 +54,7 @@ app.get('/getCurrentUser', verifyToken, async (req, res) => {
 });
 
 app.get('/getNotes', verifyToken, async (req, res) => {
-    const assigneeId = req.assigneeId;
+    const assigneeId = req.userId;
 
     const notes = await prisma.notes.findMany({ 
         where: { assigneeId }
@@ -63,14 +63,43 @@ app.get('/getNotes', verifyToken, async (req, res) => {
     res.send({ notes });
 });
 
+app.put("/notes/:id", verifyToken, async (req, res) => {
+  try {
+    const userId = req.userId;
+    const id = parseInt(req.params.id, 10);
+
+    const { title, description, status, dueDate } = req.body;
+
+    const note = await prisma.notes.findFirst({
+      where: { id, assigneeId: userId }, 
+    });
+    if (!note) return res.status(404).send({ error: "Note not found." });
+
+    const updated = await prisma.notes.update({
+      where: { id },
+      data: {
+        title,
+        description,
+        status,
+        dueDate: dueDate ? new Date(dueDate) : null,
+      },
+    });
+
+    res.send({ note: updated });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ error: "Failed to update note." });
+  }
+});
+
 app.post('/createNote', verifyToken, async (req, res) => {
-    const assigneeId = req.assigneeId;
-    const { noteData } = req.body.noteData;
+    const assigneeId = req.userId;
+    const noteData  = req.body.noteData;
 
     if (!noteData.title) return res.send({ error: "You must submit a title to your note."});
     if (!noteData.description) return res.send({ error: "You must submit some kind of text in the description." });
     if (noteData.description.length < 10) return res.send({ error: "Your note must be at least 10 characters." });
-
+   
     const user = await prisma.user.findUnique({ where: { id: assigneeId } });
     if (!user) return res.send({ error: "User not found." });
 
@@ -78,7 +107,7 @@ app.post('/createNote', verifyToken, async (req, res) => {
         data: {
             title: noteData.title,
             description: noteData.description,
-            dueDate: noteData.dueDate,
+            dueDate: noteData.dueDate ? new Date(noteData.dueDate) : null,
             status: noteData.status,            
             user: { connect: { id: assigneeId } }
         }
