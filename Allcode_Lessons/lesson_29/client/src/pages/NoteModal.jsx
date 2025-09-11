@@ -10,11 +10,14 @@ const statusBadgeClasses = (status) =>
 
 function toDateTimeLocalValue(value) {
   if (!value) return "";
+
   const d = new Date(value);
-  const pad = (n) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(
-    d.getHours()
-  )}:${pad(d.getMinutes())}`;
+  if (isNaN(d)) return "";          
+  
+  const tzOffsetMs = d.getTimezoneOffset() * 60 * 1000;
+  const local = new Date(d.getTime() - tzOffsetMs);
+
+  return local.toISOString().slice(0, 16);
 }
 
 export default function NoteModal({ note, user, onClose, onSaved }) {
