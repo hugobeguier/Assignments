@@ -184,7 +184,7 @@ export default function Note() {
                                         name="dueDate"
                                         value={note.dueDate}
                                         onChange={handleChange}
-                                        type="date"
+                                        type="datetime-local"
                                         className="w-full rounded-lg border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                     />
                                 </div>

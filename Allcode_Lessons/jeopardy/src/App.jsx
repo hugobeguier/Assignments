@@ -1,88 +1,98 @@
 import { useState } from 'react';
-import flagPortugal from "./assets/Portugal.png";
-import flagRumania from "./assets/Rumanien.png";
-import flagMexico from "./assets/Mexico.png";
-import flagEgypt from "./assets/Egypt.png";
-import flagEtiopien from "./assets/Etiopien.png";
-import monaLisa from "./assets/monaLisa.png";
-import earth from "./assets/earth.png";
-import streams from "./assets/streams.png";
-import norge from "./assets/norge.png";
-import abba from "./assets/abba.png";
+import sins from "./assets/sins.png";
+import benjamin from "./assets/benjamin.png";
+import shrek from "./assets/shrek.png";
+import taylorSwift from "./assets/taylorSwift.png";
+import trump from "./assets/trump.png";
+import charlie from "./assets/charlie.jpg";
+import yak from "./assets/yak.png";
+import sicilien from "./assets/sicilien.png";
+
+// import monaLisa from "./assets/monaLisa.png";
+// import earth from "./assets/earth.png";
+// import streams from "./assets/streams.png";
+// import norge from "./assets/norge.png";
+// import abba from "./assets/abba.png";
 
 
-import bulle from "./assets/abba.png";
-import barack from "./assets/abba.png";
-import gustav from "./assets/abba.png";
-import gotland from "./assets/abba.png";
-import lejon from "./assets/abba.png";
-import tiktok from "./assets/abba.png";
-import position from "./assets/abba.png";
-import michelin from "./assets/abba.png";
-import fotboll from "./assets/abba.png";
-import stressed from "./assets/abba.png";
-import jesus from "./assets/jesus.png";
+// import bulle from "./assets/abba.png";
+// import barack from "./assets/abba.png";
+// import gustav from "./assets/abba.png";
+// import gotland from "./assets/abba.png";
+// import lejon from "./assets/abba.png";
+// import tiktok from "./assets/abba.png";
+// import position from "./assets/abba.png";
+// import michelin from "./assets/abba.png";
+// import fotboll from "./assets/abba.png";
+// import stressed from "./assets/abba.png";
+// import jesus from "./assets/jesus.png";
 
 
 const data = [
   {
+    category: "2025",
+    questions: [
+      { value: 100, question: "Begreppet ”6–7” vilken gest gör man?" },
+      { value: 200, question: "I år fick vi en ny påve vilket land är han ifrån?" },
+      { value: 400, question: "Vilket land vann Eurovision?" },
+      { value: 600, question: "Vad heter den amerikanska högerdebattören som sköts ihjäl i höstas?" },
+      { value: 800, question: "Vilken var den mest sedda biofilmen i Sverige 2025?"},
+      { value: 1000, question: "I somras var det fotbolls-EM för damer. Hur långt gick Sverige i turneringen?" }
+    ]
+  },
+  {
+    category: "Vem är detta?",
+    questions: [
+      { value: 100, question: "", image: shrek },
+      { value: 200, question: "", image: charlie },
+      { value: 400, question: "", image: sins },
+      { value: 600, question: "", image: trump },
+      { value: 800, question: "" , image: benjamin},
+      { value: 1000, question: "", image:  taylorSwift}
+    ]
+  },
+  {
+    category: "Historia & Kultur",
+    questions: [
+      { value: 100, question: "Vad hette USA's första president?" },
+      { value: 200, question: "Vilket år föll Berlinmuren?" },
+      { value: 400, question: "Vilken svensk sagofigur hade 80-års jubelium i år?" },
+      { value: 600, question: "Vilken stad brukar kallas för 'Sverige första stad'?" },
+      { value: 800, question: "Vilket land har Cricket som deras nationalsport?" },
+      { value: 1000, question: "Vad hette perioden då meteoren kom och utrotade alla dinosaurer?" }
+    ]
+  },
+  {
+    category: "Allmänt",
+    questions: [
+      { value: 100, question: "Är en kilometer längre eller kortare än en engelsk mile?" },
+      { value: 200, question: "Vad används för att smaksätta gin?" },
+      { value: 400, question: "Vilken vetenskapsman har vunnit Nobelpriset två gånger?" },
+      { value: 600, question: "Vad är skillnaden mellan en Oxe och en Tjur?" }, 
+      { value: 800, question: "I vilket land uppfanns kaffe?" },
+      { value: 1000, question: "Vilket djur har tre vaginor?" }
+    ]
+  },
+  {
     category: "Geografi",
     questions: [
-      { value: 100, question: "Vilket är världens näst största land?" },
-      { value: 200, question: "Vilket är världen minsta land?" },
-      { value: 500, question: "Vilket land var först med att lägga ananas på pizza?" },
-      { value: 800, question: "Hur många länder finns det i världen?", image: earth },
-      { value: 1000, question: "Vad heter Zimbabwe's huvudstad?" }
+      { value: 100, question: "Genom vilka länder sträcker sig Alperna?" },
+      { value: 200, question: "Hur många huvudstäder har Sydafrika?" },
+      { value: 400, question: "I vilket hav ligger Marianagraven?"},
+      { value: 600, question: "I vilken världsdel hittar man detta djuret?",  yak},
+      { value: 800, question: "Vilken ö's flagga är detta?", sicilien },
+      { value: 1000, question: "La pas är huvudstad i vilket land?" }
     ]
   },
   {
-    category: "Kultur",
+    category: "Film citat",
     questions: [
-      { value: 100, question: "Vad hette TikTok förut?" },
-      { value: 200, question: "Vad heter karaktären som säger 'tänk om man vill gå och lägga sig halv tio då?' i Torkel i knipa?" },
-      { value: 500, question: "Pippi Långstrump har många mellannamn. Ett av dem är en kryddväxt?" },
-      { value: 800, question: "Vem målade Mona Lisa?", image: monaLisa },
-      { value: 1000, question: "Vilken är den mest streamade låten på spotify genom tiderna?", image: streams }
-    ]
-  },
-  {
-    category: "Historia",
-    questions: [
-      { value: 100, question: "Vilket år föddes Jesus?", image: jesus },
-      { value: 200, question: "Vilket år startade andra världskriget?" },
-      { value: 500, question: "Vilken stad var Sveriges huvudstad innan Stockholm?", image: norge },
-      { value: 800, question: "Vilka länder slogs i Waterloo?", image: abba },
-      { value: 1000, question: "Vem sa: 'No one is born hating another person because of the color of his skin, or his background, or his religion'?" }
-    ]
-  },
-  {
-    category: "Allmänbildning",
-    questions: [
-      { value: 100, question: "Vad kostar det att göra en Kanelbulle?", image: bulle },
-      { value: 200, question: "Vad heter denna position?", image: position },
-      { value: 500, question: "Vad heter Sveriges enda 3 sjärniga michellin restaurang?", image: michelin },
-      { value: 800, question: "Vilket land vann fotbolls VM 2022?", image: fotboll },
-      { value: 1000, question: "Hur många andetag tar en människa dagligen?", image: stressed }
-    ]
-  },
-  {
-    category: "Gissa året",
-    questions: [
-      { value: 100, question: "Vilket år åkte vi till gotland för första gången?", image: gotland },
-      { value: 200, question: "Vilket år kom TikTok ut?", image: tiktok },
-      { value: 500, question: "Vilket år kom filmen Lejon Kungen ut?", image: lejon },
-      { value: 800, question: "Vilket år blev Barack Obama president?", image: barack },
-      { value: 1000, question: "Vilket årtal kröntes Gustav Vasa?", image: gustav }
-    ]
-  },
-  {
-    category: "Flaggor",
-    questions: [
-      { value: 100, question: "Vilket lands flagga är detta?", image: flagPortugal },
-      { value: 200, question: "Vilket lands flagga är detta?", image: flagRumania },
-      { value: 500, question: "Vilket lands flagga är detta?", image: flagMexico },
-      { value: 800, question: "Vilket lands flagga är detta?", image: flagEgypt },
-      { value: 1000, question: "Vilket lands flagga är detta?", image: flagEtiopien }
+      { value: 100, question: "Here's Johnny!" },
+      { value: 200, question: "Draw me like one of your french girls" },
+      { value: 400, question: "Luke, I am your father" },
+      { value: 600, question: "Royal with cheese" },
+      { value: 800, question: "You're gonna need a bigger boat" },
+      { value: 1000, question: "You're a fake and a phony!" }
     ]
   }
 ];
