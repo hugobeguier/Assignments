@@ -8,25 +8,6 @@ import charlie from "./assets/charlie.jpg";
 import yak from "./assets/yak.png";
 import sicilien from "./assets/sicilien.png";
 
-// import monaLisa from "./assets/monaLisa.png";
-// import earth from "./assets/earth.png";
-// import streams from "./assets/streams.png";
-// import norge from "./assets/norge.png";
-// import abba from "./assets/abba.png";
-
-
-// import bulle from "./assets/abba.png";
-// import barack from "./assets/abba.png";
-// import gustav from "./assets/abba.png";
-// import gotland from "./assets/abba.png";
-// import lejon from "./assets/abba.png";
-// import tiktok from "./assets/abba.png";
-// import position from "./assets/abba.png";
-// import michelin from "./assets/abba.png";
-// import fotboll from "./assets/abba.png";
-// import stressed from "./assets/abba.png";
-// import jesus from "./assets/jesus.png";
-
 
 const initialTeams = [
   { id: "t1", name: "Lag 1", points: 0 },
@@ -40,7 +21,7 @@ const data = [
     category: "2025",
     questions: [
       { value: 100, question: "Begreppet ”6–7” vilken gest gör man?" },
-      { value: 200, question: "I år fick vi en ny påve vilket land är han ifrån?" },
+      { value: 200, question: "I år fick vi en ny påve, vilket land är han ifrån?" },
       { value: 400, question: "Vilket land vann Eurovision?" },
       { value: 600, question: "Vad heter den amerikanska högerdebattören som sköts ihjäl i höstas?" },
       { value: 800, question: "Vilken var den mest sedda biofilmen i Sverige 2025?" },
@@ -64,7 +45,7 @@ const data = [
       { value: 100, question: "Vad hette USA's första president?" },
       { value: 200, question: "Vilket år föll Berlinmuren?" },
       { value: 400, question: "Vilken svensk sagofigur hade 80-års jubelium i år?" },
-      { value: 600, question: "Vilken stad brukar kallas för 'Sverige första stad'?" },
+      { value: 600, question: "Vilken stad brukar kallas för 'Sveriges första stad'?" },
       { value: 800, question: "Vilket land har Cricket som deras nationalsport?" },
       { value: 1000, question: "Vad hette perioden då meteoren kom och utrotade alla dinosaurer?" }
     ]
