@@ -1,13 +1,5 @@
 import { useState } from 'react';
 
-import sins from "./assets/sins.png";
-import benjamin from "./assets/benjamin.png";
-import shrek from "./assets/shrek.png";
-import taylorSwift from "./assets/taylorSwift.png";
-import trump from "./assets/trump.png";
-import charlie from "./assets/charlie.jpg";
-import yak from "./assets/yak.png";
-import sicilien from "./assets/sicilien.png";
 import gissanamn6 from "./assets/Gissanamn6.jpg";
 import Gissanamn1 from "./assets/Gissanamn1.jpg";
 import Gissanamn2 from "./assets/Gissanamn2.jpg";
@@ -82,8 +74,8 @@ const data = [
       { value: 100, question: "Vilket djur kan inte hoppa?" },
       { value: 200, question: "Hur lång tid tar det för en ananas att växa?" },
       { value: 400, question: "Hur mycket godis äter en svensk i snitt per år?" },
-      { value: 600, question: "Vilken är den vanligaste födelsedagen i Sverige?", yak },
-      { value: 800, question: "Hur många öar har Sverige?", sicilien },
+      { value: 600, question: "Vilken är den vanligaste födelsedagen i Sverige?"},
+      { value: 800, question: "Hur många öar har Sverige?"},
       { value: 1000, question: "Hur många varv runt jorden går en människa i genomsnitt under sin livstid?" }
     ]
   },
