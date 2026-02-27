@@ -166,7 +166,7 @@ function App() {
   return (
     <div className="bg-blue-900 min-h-screen flex flex-col items-center justify-start py-8 gap-4">
       {/* SCOREBOARD */}
-      <div className="w-11/12 max-w-6xl grid grid-cols-2 md:grid-cols-4 gap-2">
+      <div className="w-11/12 max-w-6xl grid grid-cols-2 md:grid-cols-5 gap-2">
         {teams.map((t) => (
           <div
             key={t.id}
