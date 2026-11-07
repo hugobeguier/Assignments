@@ -1,11 +1,10 @@
 import { useState } from 'react';
 
 const initialTeams = [
-  { id: "t1", name: "Lag 1", points: 0 },
-  { id: "t2", name: "Lag 2", points: 0 },
-  { id: "t3", name: "Lag 3", points: 0 },
-  { id: "t4", name: "Lag 4", points: 0 },
-  { id: "t5", name: "Lag 5", points: 0 },
+  { id: "t1", name: "Lag 1", points: 0, color: "bg-red-600" },
+  { id: "t2", name: "Lag 2", points: 0, color: "bg-green-600" },
+  { id: "t3", name: "Lag 3", points: 0, color: "bg-purple-600" },
+  { id: "t4", name: "Lag 4", points: 0, color: "bg-orange-500" },
 ];
 
 const data = [
@@ -82,6 +81,10 @@ function App() {
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [showAnswer, setShowAnswer] = useState(false);
 
+  // Renaming a team
+  const [renamingTeamId, setRenamingTeamId] = useState(null);
+  const [nameDraft, setNameDraft] = useState("");
+
   // Teams + points
   const [teams, setTeams] = useState(initialTeams);
 
@@ -147,19 +150,37 @@ function App() {
     setSelectedQuestion(null);
   };
 
+  const openRename = (team) => {
+    setNameDraft(team.name);
+    setRenamingTeamId(team.id);
+  };
+
+  const saveTeamName = () => {
+    const name = nameDraft.trim();
+    if (name) {
+      setTeams((prev) =>
+        prev.map((t) => (t.id === renamingTeamId ? { ...t, name } : t))
+      );
+    }
+    setRenamingTeamId(null);
+  };
+
   const getTeamName = (teamId) => teams.find((t) => t.id === teamId)?.name ?? "";
+  const getTeamColor = (teamId) => teams.find((t) => t.id === teamId)?.color ?? "bg-gray-500";
 
   return (
     <div className="bg-blue-900 min-h-screen flex flex-col items-center justify-start py-8 gap-4">
       {/* SCOREBOARD */}
-      <div className="w-11/12 max-w-6xl grid grid-cols-2 md:grid-cols-5 gap-2">
+      <div className="w-11/12 max-w-6xl grid grid-cols-2 md:grid-cols-4 gap-2">
         {teams.map((t) => (
           <div
             key={t.id}
-            className={`rounded-lg p-3 text-center transition-all ${
+            onClick={() => openRename(t)}
+            title="Klicka för att döpa om laget"
+            className={`${t.color} text-white rounded-lg p-3 text-center transition-all cursor-pointer ${
               selectedTeamId === t.id
-                ? "bg-yellow-400 text-blue-900 ring-4 ring-white scale-105 shadow-lg"
-                : "bg-blue-800 text-yellow-300"
+                ? "ring-4 ring-white scale-105 shadow-lg"
+                : "opacity-80"
             }`}
           >
             <div className="font-bold uppercase">{t.name}</div>
@@ -193,7 +214,7 @@ function App() {
                 key={key}
                 className={`relative text-center p-6 cursor-pointer font-bold
                   ${isScored
-                    ? "bg-green-700 text-white opacity-70 line-through"
+                    ? `${getTeamColor(answers[key])} text-white`
                     : "bg-blue-700 text-yellow-400 hover:bg-blue-600"
                   } text-2xl md:text-3xl`}
                 onClick={() => {
@@ -216,6 +237,9 @@ function App() {
             <div className="text-xl font-bold uppercase text-blue-700 mb-2">
               {selectedQuestion.category}
             </div>
+            <div className="text-3xl font-extrabold text-yellow-500 mb-3">
+              {selectedQuestion.value} poäng
+            </div>
 
             {/* TEAM PICKER */}
             <div className="flex flex-wrap gap-2 justify-center mb-4">
@@ -225,7 +249,7 @@ function App() {
                   onClick={() => setSelectedTeamId(t.id)}
                   className={`px-3 py-2 rounded-lg font-bold
                     ${selectedTeamId === t.id
-                      ? "bg-blue-700 text-white"
+                      ? `${t.color} text-white ring-4 ring-gray-800`
                       : "bg-gray-200 text-gray-800 hover:bg-gray-300"
                     }`}
                 >
@@ -288,6 +312,43 @@ function App() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* RENAME TEAM MODAL */}
+      {renamingTeamId && (
+        <div className="fixed inset-0 flex items-center justify-center bg-blue-900 bg-opacity-70">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              saveTeamName();
+            }}
+            className="bg-white rounded-xl p-6 w-80 text-center"
+          >
+            <div className="text-xl font-bold text-blue-700 mb-3">Döp om laget</div>
+            <input
+              autoFocus
+              value={nameDraft}
+              onChange={(e) => setNameDraft(e.target.value)}
+              maxLength={20}
+              className="w-full border-2 border-gray-300 rounded-lg px-3 py-2 mb-4 text-center font-bold"
+            />
+            <div className="flex gap-2 justify-center">
+              <button
+                type="button"
+                onClick={() => setRenamingTeamId(null)}
+                className="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-200"
+              >
+                Avbryt
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-500"
+              >
+                Spara
+              </button>
+            </div>
+          </form>
         </div>
       )}
     </div>
